@@ -365,3 +365,44 @@ TEST(PlistTable, FieldsComplexStructure)
   ASSERT_NE(std::find(fields.begin(), fields.end(), "key1.key3.key5"), fields.end());
   ASSERT_NE(std::find(fields.begin(), fields.end(), "key1.key3.key6"), fields.end());
 }
+
+TEST(PlistTable, CamelcaseNames)
+{
+  std::string xml = R"(
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/ PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Key1</key>
+    <array>
+      <dict>
+        <key></key>
+        <string>value</string>
+        <key>Key2</key>
+        <string>value2</string>
+      </dict>
+      <dict>
+        <key>key2</key>
+        <string>value</string>
+        <key>key3</key>
+        <string>value3</string>
+        <key>Key4</key>
+        <array>
+          <array>
+            <string>value4</string>
+          </array>
+        </array>
+      </dict>
+    </array>
+  </dict>
+</plist>
+)";
+  PlistTable table;
+  ASSERT_EQ(table.load(xml.c_str(), xml.length(), 0), true);
+  ASSERT_EQ(table.getFields().size(), (size_t)4);
+  auto fields = table.getFields();
+  ASSERT_NE(std::find(fields.begin(), fields.end(), "key1"), fields.end());
+  ASSERT_NE(std::find(fields.begin(), fields.end(), "key1.key2"), fields.end());
+  ASSERT_NE(std::find(fields.begin(), fields.end(), "key1.key3"), fields.end());
+  ASSERT_NE(std::find(fields.begin(), fields.end(), "key1.key4._"), fields.end());
+}
