@@ -48,8 +48,10 @@ Table<Cell> PlistTable::getRowTable(const Cell::Row &row, int depth, const std::
   if (depth-- == 0) return table;
 
   for (auto &item : row) {
-    const auto delimiter = prefix.empty() || item.first.empty() ? "" : ".";
-    const auto name = prefix.empty() && item.first.empty() ? "_" : prefix + delimiter + item.first;
+    std::string suffix;
+    std::transform(item.first.begin(), item.first.end(), std::back_inserter(suffix), std::tolower);
+    const auto delimiter = prefix.empty() || suffix.empty() ? "" : ".";
+    const auto name = prefix.empty() && suffix.empty() ? "_" : prefix + delimiter + suffix;
     auto itemTable = getTable(item.second, depth, name);
     table.combine(itemTable);
   }
