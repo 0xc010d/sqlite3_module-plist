@@ -6,6 +6,7 @@
 #include "PlistCursor.hpp"
 
 #include <sqlite3ext.h>
+#include <iostream>
 
 SQLITE_EXTENSION_INIT3
 
@@ -46,6 +47,9 @@ int xConnect(sqlite3 *db, void *, int argc, const char *const *argv, sqlite3_vta
   auto result = sqlite3_declare_vtab(db, schema.str().c_str());
   if (result == SQLITE_OK) {
     *ppVTab = table->getRef();
+  }
+  else {
+    *pzErr = sqlite3_mprintf(sqlite3_errmsg(db));
   }
   return result;
 }
